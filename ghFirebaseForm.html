@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Formulario con Firebase</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #e0f2f1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      width: 300px;
+    }
+    .form-container h2 {
+      text-align: center;
+      color: #00796b;
+    }
+    .form-container input, .form-container textarea, .form-container button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .form-container button {
+      background: #00796b;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .form-container button:hover {
+      background: #004d40;
+    }
+    .success-message {
+      text-align: center;
+      color: green;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <h2>Contáctanos</h2>
+  <form id="contactForm">
+    <input type="text" id="nombre" placeholder="Nombre" required>
+    <input type="email" id="correo" placeholder="Correo" required>
+    <textarea id="mensaje" placeholder="Mensaje" rows="4" required></textarea>
+    <button type="submit">Enviar</button>
+  </form>
+  <div class="success-message" id="successMessage">¡Mensaje enviado!</div>
+</div>
+
+<!-- Firebase SDKs -->
+<script type="module">
+  // Importa las funciones que necesitas de los SDK de Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+  // Tu configuración de Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCjzfh2LqrFf8d317SB8knaG-hCmcEQB3U",
+    authDomain: "ejercicioiafb.firebaseapp.com",
+    projectId: "ejercicioiafb",
+    storageBucket: "ejercicioiafb.appspot.com",  <!-- aquí corregí "firebasestorage.app" a "firebaseapp.com" -->
+    messagingSenderId: "628579942859",
+    appId: "1:628579942859:web:3c262573ee7bf9b1af364e"
+  };
+
+  // Inicializa Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Manejo del formulario
+  const contactForm = document.getElementById('contactForm');
+  const successMessage = document.getElementById('successMessage');
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Obtiene los valores del formulario
+    const nombre = document.getElementById('nombre').value;
+    const correo = document.getElementById('correo').value;
+    const mensaje = document.getElementById('mensaje').value;
+
+    try {
+      // Envía los datos a Firestore
+      await addDoc(collection(db, 'contactos'), {
+        nombre: nombre,
+        correo: correo,
+        mensaje: mensaje,
+        fecha: new Date()
+      });
+
+      // Muestra un mensaje de éxito
+      successMessage.style.display = 'block';
+
+      // Resetea el formulario
+      contactForm.reset();
+      
+      // Oculta el mensaje después de unos segundos
+      setTimeout(() => {
+        successMessage.style.display = 'none';
+      }, 3000);
+
+    } catch (error) {
+      console.error('Error al enviar el mensaje: ', error);
+    }
+  });
+</script>
+
+</body>
+</html>
